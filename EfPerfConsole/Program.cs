@@ -38,7 +38,9 @@ namespace EfPerfConsole
 
             //methods.QueryView();
 
-            var result = BenchmarkRunner.Run<EfMethods>();
+            //var result = BenchmarkRunner.Run<EfMethods>();
+
+            methods.TestJoin();
 
 
             Console.ReadLine();
@@ -74,7 +76,7 @@ namespace EfPerfConsole
                     Console.WriteLine($"Display Name: {row.Name}, BadgesCnt: {row.Venues.Count}");
             }
         }
-       
+
 
         [Benchmark]
         public void ExplicitLoadWithFullChildData()
@@ -171,7 +173,7 @@ namespace EfPerfConsole
             {
 
                 var d = content.Tenants.OrderBy(x => x.Id).Take(10).ToList();
-         
+
                 var t = content.Tenants.Find(Guid.Parse("A46E5CBD-23B5-5045-EE45-00151B1AA8CD"));
                 Console.WriteLine(t.Name);
             }
@@ -189,6 +191,21 @@ namespace EfPerfConsole
                 var g = Guid.Parse("A46E5CBD-23B5-5045-EE45-00151B1AA8CD");
                 var t = content.Tenants.Where(x => x.Id == g).Single();
                 Console.WriteLine(t.Name);
+            }
+        }
+        public void TestJoin()
+        {
+            using (var content = new EfDbContext())
+            {
+                var result = from t in content.TenantVenues
+                             join tenant in content.Tenants on t.Id equals tenant.Id into tenants
+                             from tenant in tenants.DefaultIfEmpty()
+                             join venue in content.Venues on t.VenueId equals venue.Id into venues
+                             from venue in venues.DefaultIfEmpty()
+
+                             select new { TenantVenue = new { TVID = t.Id }, Tenant = new { tenant.Name }, Venue = new { venue.Name } };
+
+                Console.WriteLine(result);
             }
         }
     }

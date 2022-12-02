@@ -216,6 +216,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="DataBackup\eftest.bak" />
     <None Include="efpt.config.json" />
     <None Include="packages.config" />
   </ItemGroup>
